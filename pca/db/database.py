@@ -21,8 +21,7 @@ def connect_from_config(config_section=None):
 
 def db_from_connection(uri, name):
     con = MongoClient(host=uri, tz_aware=True)
-    db = con[name]
-    return db
+    return con[name]
 
 
 def db_from_config(config_section=None):
@@ -76,10 +75,7 @@ def run_pipeline_cursor(pipeline_collection_tuple, db):
        MongoDB size."""
     (pipeline, collection) = pipeline_collection_tuple
     cursor = db[collection].aggregate(pipeline, allowDiskUse=True, cursor={})
-    results = []
-    for doc in cursor:
-        results.append(doc)
-    return results
+    return list(cursor)
 
 
 def ensure_indices(db, foreground=False):

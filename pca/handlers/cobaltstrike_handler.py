@@ -34,7 +34,7 @@ class CobaltStrikeCampaignsContentHandler(ContentHandler):
                     "XML does not look like Cobalt Strike campaigns.xml data."
                 )
         elif name == "entry":
-            self.currentCampaign = dict()
+            self.currentCampaign = {}
 
     def endElement(self, name):
         if name == "entry":
@@ -78,7 +78,7 @@ class CobaltStrikeTokensContentHandler(ContentHandler):
                     "XML does not look like Cobalt Strike tokens.xml data."
                 )
         elif name == "entry":
-            self.currentToken = dict()
+            self.currentToken = {}
 
     def endElement(self, name):
         if name == "entry":
@@ -118,7 +118,7 @@ class CobaltStrikeSentEmailsContentHandler(ContentHandler):
                     "XML does not look like Cobalt Strike sentemails.xml data."
                 )
         elif name == "entry":
-            self.currentEmail = dict()
+            self.currentEmail = {}
 
     def endElement(self, name):
         if name == "entry":
@@ -160,7 +160,7 @@ class CobaltStrikeWebHitsContentHandler(ContentHandler):
                     "XML does not look like Cobalt Strike webhits.xml data."
                 )
         elif name == "entry":
-            self.currentWebhit = dict()
+            self.currentWebhit = {}
 
     def endElement(self, name):
         if name == "entry":
@@ -202,7 +202,7 @@ class CobaltStrikeApplicationsContentHandler(ContentHandler):
                     "XML does not look like Cobalt Strike applications.xml data."
                 )
         elif name == "entry":
-            self.currentApplication = dict()
+            self.currentApplication = {}
 
     def endElement(self, name):
         if name == "entry":

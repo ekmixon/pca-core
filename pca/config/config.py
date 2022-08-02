@@ -24,29 +24,30 @@ class Config(object):
             self.__write_config()
             print("A default configuration file was created.", file=sys.stderr)
         config = self.__read_config()
-        if config_section == None:
+        if config_section is None:
             config_section = config.get(DEFAULT_SECTION)
         self.active_section = config_section
         self.db_name = config[config_section].get(DATABASE_NAME)
         self.db_uri = config[config_section].get(DATABASE_URI)
 
     def __read_config(self):
-        config_file = open(CONFIG_FILENAME, "r")
-        config = yaml.safe_load(config_file)
-        config_file.close()
+        with open(CONFIG_FILENAME, "r") as config_file:
+            config = yaml.safe_load(config_file)
         return config
 
     def __write_config(self):
-        config = dict()
-        config[DEFAULT_SECTION] = TESTING_SECTION
-        config[TESTING_SECTION] = {
-            DATABASE_URI: DEFAULT_DATABASE_URI,
-            DATABASE_NAME: TESTING_DATABASE_NAME,
+        config = {
+            DEFAULT_SECTION: TESTING_SECTION,
+            TESTING_SECTION: {
+                DATABASE_URI: DEFAULT_DATABASE_URI,
+                DATABASE_NAME: TESTING_DATABASE_NAME,
+            },
+            PRODUCTION_SECTION: {
+                DATABASE_URI: DEFAULT_DATABASE_URI,
+                DATABASE_NAME: PRODUCTION_DATABASE_NAME,
+            },
         }
-        config[PRODUCTION_SECTION] = {
-            DATABASE_URI: DEFAULT_DATABASE_URI,
-            DATABASE_NAME: PRODUCTION_DATABASE_NAME,
-        }
+
         with open(CONFIG_FILENAME, "wb") as config_file:
             config_file.write(
                 yaml.dump(config, encoding=("utf-8"), default_flow_style=False)

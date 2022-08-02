@@ -65,14 +65,10 @@ def valid_customer_contacts(contacts_list):
     for contact in contacts_list:
         for req_field in ("email", "name", "type"):
             if not contact.get(req_field):
-                raise ValidationError(
-                    "{} is required in every customer contact".format(req_field)
-                )
+                raise ValidationError(f"{req_field} is required in every customer contact")
         if contact["type"] not in ["TECHNICAL", "DISTRO"]:
             raise ValidationError(
-                "customer contact type must be either TECHNICAL or DISTRO, not {}".format(
-                    contact["type"]
-                )
+                f'customer contact type must be either TECHNICAL or DISTRO, not {contact["type"]}'
             )
 
 
@@ -88,10 +84,7 @@ class CustomerDoc(RootDoc):
 
     def get_all_customers():
         query_set = CustomerDoc.objects.all().order_by([("_id", 1)])
-        all_customers = []
-        for customer in query_set:
-            all_customers.append(customer._id)
-        return all_customers
+        return [customer._id for customer in query_set]
 
     def save(self, *args, **kwargs):
         super(CustomerDoc, self).save(*args, **kwargs)
@@ -122,10 +115,9 @@ def valid_template_appearance(appearance_dict):
     for key in appearance_dict.keys():
         if key not in INDICATOR_LOOKUP[indicator_category].keys():
             raise ValidationError(
-                'Unknown key "{}" in template "{}" section'.format(
-                    key, indicator_category
-                )
+                f'Unknown key "{key}" in template "{indicator_category}" section'
             )
+
 
     for indicator_name in INDICATOR_LOOKUP[indicator_category].keys():
         valid_keys = INDICATOR_LOOKUP[indicator_category][indicator_name].keys()
@@ -145,10 +137,9 @@ def valid_template_sender(sender_dict):
     for key in sender_dict.keys():
         if key not in INDICATOR_LOOKUP[indicator_category].keys():
             raise ValidationError(
-                'Unknown key "{}" in template "{}" section'.format(
-                    key, indicator_category
-                )
+                f'Unknown key "{key}" in template "{indicator_category}" section'
             )
+
 
     for indicator_name in INDICATOR_LOOKUP[indicator_category].keys():
         valid_keys = INDICATOR_LOOKUP[indicator_category][indicator_name].keys()
@@ -168,10 +159,9 @@ def valid_template_relevancy(relevancy_dict):
     for key in relevancy_dict.keys():
         if key not in INDICATOR_LOOKUP[indicator_category].keys():
             raise ValidationError(
-                'Unknown key "{}" in template "{}" section'.format(
-                    key, indicator_category
-                )
+                f'Unknown key "{key}" in template "{indicator_category}" section'
             )
+
 
     for indicator_name in INDICATOR_LOOKUP[indicator_category].keys():
         valid_keys = INDICATOR_LOOKUP[indicator_category][indicator_name].keys()
@@ -191,10 +181,9 @@ def valid_template_behavior(behavior_dict):
     for key in behavior_dict.keys():
         if key not in INDICATOR_LOOKUP[indicator_category].keys():
             raise ValidationError(
-                'Unknown key "{}" in template "{}" section'.format(
-                    key, indicator_category
-                )
+                f'Unknown key "{key}" in template "{indicator_category}" section'
             )
+
 
     for indicator_name in INDICATOR_LOOKUP[indicator_category].keys():
         valid_keys = INDICATOR_LOOKUP[indicator_category][indicator_name].keys()
@@ -305,11 +294,12 @@ class EmailDoc(RootDoc):
         final = True  # so we don't get a '_cls' field in these documents (e.g. "_cls" : "__main__.Customer")
         ignore_unknown_fields = True  # TODO see if this can be inherited from RootDoc
 
-    def find_by_user_campaign_time(user_id, campaign_id, time):
+    def find_by_user_campaign_time(self, campaign_id, time):
         try:
             doc = EmailDoc.objects.raw(
-                {"user": user_id, "campaign": campaign_id, "time": time}
+                {"user": self, "campaign": campaign_id, "time": time}
             ).first()
+
         except DoesNotExist:
             return None
         return doc
@@ -340,15 +330,16 @@ class ClickDoc(RootDoc):
         final = True  # so we don't get a '_cls' field in these documents (e.g. "_cls" : "__main__.Customer")
         ignore_unknown_fields = True  # TODO see if this can be inherited from RootDoc
 
-    def find_by_user_time_ip(user_id, time, source_ip_str):
+    def find_by_user_time_ip(self, time, source_ip_str):
         try:
             doc = ClickDoc.objects.raw(
                 {
-                    "user": user_id,
+                    "user": self,
                     "time": time,
                     "source_ip_int": int(ipaddress.ip_address(source_ip_str)),
                 }
             ).first()
+
         except DoesNotExist:
             return None
         return doc
@@ -391,16 +382,17 @@ class ApplicationDoc(RootDoc):
         final = True  # so we don't get a '_cls' field in these documents (e.g. "_cls" : "__main__.Customer")
         ignore_unknown_fields = True  # TODO see if this can be inherited from RootDoc
 
-    def find_by_user_time_name_version(user_id, time, app_name, app_version):
+    def find_by_user_time_name_version(self, time, app_name, app_version):
         try:
             doc = ApplicationDoc.objects.raw(
                 {
-                    "user": user_id,
+                    "user": self,
                     "time": time,
                     "name": app_name,
                     "version": app_version,
                 }
             ).first()
+
         except DoesNotExist:
             return None
         return doc
@@ -441,12 +433,16 @@ class UserReportDoc(RootDoc):
         final = True
         ignore_unknown_fields = True  # TODO see if this can be inherited from RootDoc, see https://github.com/cisagov/pca-core/issues/7
 
-    def find_by_customer_assessment_campaign(customer_id, assessment_id, campaign_id):
+    def find_by_customer_assessment_campaign(self, assessment_id, campaign_id):
         try:
             doc = UserReportDoc.objects.raw(
-                {"customer": customer_id,
-                 "assessment": assessment_id,
-                 "campaign": campaign_id}).first()
+                {
+                    "customer": self,
+                    "assessment": assessment_id,
+                    "campaign": campaign_id,
+                }
+            ).first()
+
         except DoesNotExist:
             return None
         return doc

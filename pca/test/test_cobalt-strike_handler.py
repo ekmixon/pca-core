@@ -21,17 +21,16 @@ TEST_CS_APPLICATIONS_FILENAME = "test_XMLData/applications.xml"
 
 
 def pytest_runtest_makereport(item, call):
-    if "incremental" in item.keywords:
-        if call.excinfo is not None:
-            parent = item.parent
-            parent._previousfailed = item
+    if "incremental" in item.keywords and call.excinfo is not None:
+        parent = item.parent
+        parent._previousfailed = item
 
 
 def pytest_runtest_setup(item):
     if "incremental" in item.keywords:
         previousfailed = getattr(item.parent, "_previousfailed", None)
         if previousfailed is not None:
-            pytest.xfail("previous test failed (%s)" % previousfailed.name)
+            pytest.xfail(f"previous test failed ({previousfailed.name})")
 
 
 class YourMom(object):
@@ -62,9 +61,8 @@ class TestCSCampaignsHandler:
         handler = CobaltStrikeCampaignsContentHandler(
             your_moms_campaigns.element_callback, your_moms_campaigns.end_callback
         )
-        f = open(TEST_CS_CAMPAIGNS_FILENAME, "rb")
-        parse(f, handler)
-        f.close()
+        with open(TEST_CS_CAMPAIGNS_FILENAME, "rb") as f:
+            parse(f, handler)
 
     def test_correct_number_of_end_callbacks(self, your_moms_campaigns):
         assert (
@@ -107,9 +105,8 @@ class TestCSTokensHandler:
         handler = CobaltStrikeTokensContentHandler(
             your_moms_tokens.element_callback, your_moms_tokens.end_callback
         )
-        f = open(TEST_CS_TOKENS_FILENAME, "rb")
-        parse(f, handler)
-        f.close()
+        with open(TEST_CS_TOKENS_FILENAME, "rb") as f:
+            parse(f, handler)
 
     def test_correct_number_of_end_callbacks(self, your_moms_tokens):
         assert (
@@ -147,9 +144,8 @@ class TestCSSentEmailsHandler:
         handler = CobaltStrikeSentEmailsContentHandler(
             your_moms_emails.element_callback, your_moms_emails.end_callback
         )
-        f = open(TEST_CS_SENT_EMAILS_FILENAME, "rb")
-        parse(f, handler)
-        f.close()
+        with open(TEST_CS_SENT_EMAILS_FILENAME, "rb") as f:
+            parse(f, handler)
 
     def test_correct_number_of_end_callbacks(self, your_moms_emails):
         assert (
@@ -191,9 +187,8 @@ class TestCSSWebhitsHandler:
         handler = CobaltStrikeWebHitsContentHandler(
             your_moms_webhits.element_callback, your_moms_webhits.end_callback
         )
-        f = open(TEST_CS_WEB_HITS_FILENAME, "rb")
-        parse(f, handler)
-        f.close()
+        with open(TEST_CS_WEB_HITS_FILENAME, "rb") as f:
+            parse(f, handler)
 
     def test_correct_number_of_end_callbacks(self, your_moms_webhits):
         assert (
@@ -231,9 +226,8 @@ class TestCSSApplicationsHandler:
         handler = CobaltStrikeApplicationsContentHandler(
             your_moms_applications.element_callback, your_moms_applications.end_callback
         )
-        f = open(TEST_CS_APPLICATIONS_FILENAME, "rb")
-        parse(f, handler)
-        f.close()
+        with open(TEST_CS_APPLICATIONS_FILENAME, "rb") as f:
+            parse(f, handler)
 
     def test_correct_number_of_end_callbacks(self, your_moms_applications):
         assert (
@@ -264,5 +258,5 @@ class TestCSSApplicationsHandler:
             your_moms_applications.elements[0]["external_ip"] == "192.168.168.254"
         ), "unexpected external_ip for application 0"
         assert (
-            your_moms_applications.elements[0]["internal_ip"] == None
+            your_moms_applications.elements[0]["internal_ip"] is None
         ), "unexpected internal_ip for application 0"
